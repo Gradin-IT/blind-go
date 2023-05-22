@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Älgpasslottare</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/javascript-lp-solver@0.4.24/prod/solver.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- JS & CSS library of MultiSelect plugin -->
+    <script src="multiselect/jquery.multiselect.js"></script>
+    <link rel="stylesheet" href="multiselect/jquery.multiselect.css">
+</head>
+
+<body bgcolor="#7fffd4">
+<form action="http://localhost:9090/lottery" method="POST">
+    <div>
+        <table bgcolor="#7fffd4">
+            <tr>
+                <td>Välj Jägare</td>
+                <td>
+
+                        <select class="js-example-basic-multiple" name="selectHunter[]" id="selectHunter"  multiple="multiple">
+
+                        </select>
+
+                </td>
+                <td>
+                    <button>välj alla</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <table bgcolor="#7fffd4">
+            <tr>
+                <td>Välj Pass</td>
+                <td>
+                    <select class="js-example-basic-multiple" name="selectBlind[]" multiple="multiple" id="selectBlind">
+                    </select>
+                </td>
+                <td>
+                    <button>välj alla</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><input type="submit" value="lotta pass"/></td>
+            </tr>
+        </table>
+    </div>
+</form>
+</body>
+<script>
+    $.ajax({
+        url: 'http://localhost:9090/hunter',
+        success: function (data) {
+            let selectHunter = document.getElementById('selectHunter');
+            for (var i = 0; i < data.length; i++) {
+                // POPULATE SELECT ELEMENT WITH JSON.
+                selectHunter.innerHTML = selectHunter.innerHTML +
+                    '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                console.log(data[i].id)
+            }
+        }
+    })
+    $.ajax({
+        url: 'http://localhost:9090/blind',
+        success: function (data) {
+            let selectBlind = document.getElementById('selectBlind');
+            for (var i = 0; i < data.length; i++) {
+                // POPULATE SELECT ELEMENT WITH JSON.
+                selectBlind.innerHTML = selectBlind.innerHTML +
+                    '<option value="' + data[i]['id'] + '">' + data[i]['id'] + "-" + data[i]['description'] + '</option>';
+                console.log(data[i].id)
+            }
+        }
+    })
+
+</script>
+</html>
