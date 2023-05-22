@@ -19,6 +19,7 @@ func main() {
 	engine.POST("/blind", addBlind)
 	engine.DELETE("/blind", deleteBlind)
 	engine.POST("/lottery", getBlindLotteryResult)
+	engine.Static("/web", "./public")
 	engine.Run("localhost:9090")
 }
 
