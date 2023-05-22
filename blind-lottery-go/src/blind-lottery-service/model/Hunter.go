@@ -18,7 +18,7 @@ type Hunter struct {
 var hunters = []Hunter{}
 
 func loadHunters() {
-	response, err := http.Get("https://raw.githubusercontent.com/GradinIT/hunters/develop/hunters.json?token=GHSAT0AAAAAACBRS3QEDVZUN77DFEF4Z76EZDLGCGQ")
+	response, err := http.Get("https://raw.githubusercontent.com/GradinIT/hunters/develop/hunters.json")
 
 	if err != nil {
 		fmt.Print(err.Error())
