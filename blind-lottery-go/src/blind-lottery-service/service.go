@@ -24,8 +24,8 @@ func main() {
 }
 
 func getBlindLotteryResult(context *gin.Context) {
-
-	context.IndentedJSON(http.StatusOK, nil)
+	var results = []model.Result{}
+	context.IndentedJSON(http.StatusOK, results)
 }
 
 func getHunters(context *gin.Context) {
