@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"log"
+	"io"
 )
 
 func main() {
@@ -27,6 +29,11 @@ func main() {
 var blinds = util.Randomize(model.GetBlinds())
 
 func getBlindLotteryResult(context *gin.Context) {
+	jsonData, err := io.ReadAll(context.Request.Body)
+	if err != nil {
+    log.Println(err)
+	}
+	println(string(jsonData))
 	var hunters = util.Randomize(model.GetHunters())
 	var results = []model.Result{}
 	for _, hunter := range hunters {

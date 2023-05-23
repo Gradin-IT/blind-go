@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/multi-select/0.9.12/css/multi-select.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        #result tr td {
+            border-bottom: solid 1px #67CFAC;
+        }
+    </style>
 </head>
 
 <body bgcolor="#7fffd4">
@@ -29,7 +34,7 @@
 
                 </td>
                 <td>
-                    <button>välj alla</button>
+                    <button type="button" class="btn-select-all" data-target="selectHunter">välj alla</button>
                 </td>
             </tr>
         </table>
@@ -43,14 +48,17 @@
                     </select>
                 </td>
                 <td>
-                    <button>välj alla</button>
+                    <button type="button" class="btn-select-all" data-target="selectBlind">välj alla</button>
                 </td>
             </tr>
             <tr>
-                <td colspan="3"><input type="submit" value="lotta pass"/></td>
+                <td>
+                    <button type="button" class="btn-result">lotta pass</button>
+                </td>
             </tr>
         </table>
     </div>
+    <table border=0 id="result"></table>
 </form>
 </body>
 <script>
@@ -62,7 +70,7 @@
                 // POPULATE SELECT ELEMENT WITH JSON.
                 selectHunter.innerHTML = selectHunter.innerHTML +
                     '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
-                console.log(data[i].id)
+                //console.log(data[i].id)
             }
         }
     })
@@ -74,9 +82,36 @@
                 // POPULATE SELECT ELEMENT WITH JSON.
                 selectBlind.innerHTML = selectBlind.innerHTML +
                     '<option value="' + data[i]['id'] + '">' + data[i]['id'] + "-" + data[i]['description'] + '</option>';
-                console.log(data[i].id)
+                //console.log(data[i].id)
             }
         }
+    })
+    // Check/uncheck all
+    $('.btn-select-all').click(function(e){
+        let target = $(this).data('target')
+        let checked = $('#'+target+' option').prop('selected')
+        $('#'+target+' option').prop('selected', !checked);
+        $(this).text(checked ? 'välj alla' : 'välj ingen')
+    })
+    // Post selected data to backend
+    $('.btn-result').click(function(e){
+        let data = {
+            "hunters": $('#selectHunter').val(),
+            "blinds": $('#selectBlind').val()
+        }
+        //console.log(data)
+        $.ajax({
+            type: "POST",
+            url: 'http://localhost:9090/lottery',
+            data: data,
+            success: function (data) {
+                //console.log(data)
+                result.innerHTML = "";
+                for (var i = 0; i < data.length; i++) {
+                    $('#result').append('<tr><td>' + data[i].HunterName + '</td><td>' + data[i].BlindName + '</td></tr>')
+                }
+            }
+        })
     })
 </script>
 </html>

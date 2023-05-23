@@ -31,7 +31,7 @@ func loadHunters() {
 	}
 	json.Unmarshal([]byte(responseData), &hunters)
 	for _, hunter := range hunters {
-		log.Println(hunter.Name)
+		//log.Println(hunter.Name)
 		hunters = append(hunters, hunter)
 	}
 }
