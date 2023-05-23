@@ -1,6 +1,10 @@
 package util
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+	"time"
+)
 
 func RemoveIndex[T comparable](collection []T, index int) []T {
 	return append(collection[:index], collection[index+1:]...)
@@ -12,4 +16,12 @@ func IndexOf[T comparable](collection []T, el T) (int, error) {
 		}
 	}
 	return -1, errors.New("Element index not found")
+}
+
+func Randomize[T comparable](collection []T) []T {
+	rand.NewSource(time.Now().UnixNano())
+	rand.Shuffle(len(collection), func(i, j int) {
+		collection[i], collection[j] = collection[j], collection[i]
+	})
+	return collection
 }

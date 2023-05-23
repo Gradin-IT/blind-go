@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -23,9 +24,25 @@ func main() {
 	engine.Run("localhost:9090")
 }
 
+var blinds = util.Randomize(model.GetBlinds())
+
 func getBlindLotteryResult(context *gin.Context) {
+	var hunters = util.Randomize(model.GetHunters())
 	var results = []model.Result{}
+	for _, hunter := range hunters {
+		var result = model.Result{}
+		result.HunterName = hunter.Name
+		result.BlindName = getBlindName()
+		results = append(results, result)
+	}
 	context.IndentedJSON(http.StatusOK, results)
+}
+
+func getBlindName() string {
+	blinds = util.Randomize(blinds)
+	var blindName = strconv.Itoa(blinds[0].ID) + " " + blinds[0].Description
+	util.RemoveIndex(blinds, 0)
+	return blindName
 }
 
 func getHunters(context *gin.Context) {
