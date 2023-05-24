@@ -25,8 +25,8 @@ func main() {
 }
 
 type Query struct {
-	Hunters []int `json:"hunters"`
-	Blinds  []int `json:"blinds"`
+	Hunters []string `json:"hunters"`
+	Blinds  []string `json:"blinds"`
 }
 
 func getBlindLotteryResult(context *gin.Context) {
@@ -34,35 +34,30 @@ func getBlindLotteryResult(context *gin.Context) {
 	context.BindJSON(&query)
 	var hunterInfo = model.GetHunters()
 	var blindInfo = model.GetBlinds()
-	for _, b := range query.Blinds {
-		println(b)
+	for i, b := range query.Blinds {
+		println(i, b)
 	}
-	for _, h := range query.Hunters {
-		println(h)
+	for i, h := range query.Hunters {
+		println(i, h)
 	}
 	hunters := util.Randomize(query.Hunters)
 	blinds := util.Randomize(query.Blinds)
-	for _, b := range blinds {
-		println(b)
-	}
-	for _, h := range hunters {
-		println(h)
-	}
+
 	var results []model.Result
 	for i, hunter := range hunters {
 		println(results)
 		var result = model.Result{}
-		result.HunterName = hunterInfo[hunter].Name
+		hunterIndex, _ := strconv.Atoi(hunter)
+		result.HunterName = hunterInfo[hunterIndex-1].Name
 		result.BlindName = getBlindName(blinds[i], blindInfo)
 		results = append(results, result)
 	}
 	context.IndentedJSON(http.StatusOK, results)
 }
 
-func getBlindName(id int, blinds []model.Blind) string {
-	var blindName = strconv.Itoa(blinds[id].ID) + " " + blinds[id].Description
-	println(blindName)
-	return blindName
+func getBlindName(s string, info []model.Blind) string {
+	blindIndex, _ := strconv.Atoi(s)
+	return info[blindIndex].ID + " ," + info[blindIndex].Description
 }
 
 func getHunters(context *gin.Context) {
