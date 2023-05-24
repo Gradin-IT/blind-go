@@ -57,7 +57,7 @@ func getBlindLotteryResult(context *gin.Context) {
 
 func getBlindName(s string, info []model.Blind) string {
 	blindIndex, _ := strconv.Atoi(s)
-	return info[blindIndex].ID + " ," + info[blindIndex].Description
+	return info[blindIndex-1].ID + " ," + info[blindIndex-1].Description
 }
 
 func getHunters(context *gin.Context) {
