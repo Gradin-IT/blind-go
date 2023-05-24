@@ -103,7 +103,7 @@
         $.ajax({
             type: "POST",
             url: 'http://localhost:9090/lottery',
-            data: data,
+            data: JSON.stringify(data),
             success: function (data) {
                 //console.log(data)
                 result.innerHTML = "";

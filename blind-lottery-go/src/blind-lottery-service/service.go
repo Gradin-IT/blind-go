@@ -7,8 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"log"
-	"io"
 )
 
 func main() {
@@ -26,29 +24,44 @@ func main() {
 	engine.Run("localhost:9090")
 }
 
-var blinds = util.Randomize(model.GetBlinds())
+type Query struct {
+	Hunters []int `json:"hunters"`
+	Blinds  []int `json:"blinds"`
+}
 
 func getBlindLotteryResult(context *gin.Context) {
-	jsonData, err := io.ReadAll(context.Request.Body)
-	if err != nil {
-    log.Println(err)
+	var query Query
+	context.BindJSON(&query)
+	var hunterInfo = model.GetHunters()
+	var blindInfo = model.GetBlinds()
+	for _, b := range query.Blinds {
+		println(b)
 	}
-	println(string(jsonData))
-	var hunters = util.Randomize(model.GetHunters())
-	var results = []model.Result{}
-	for _, hunter := range hunters {
+	for _, h := range query.Hunters {
+		println(h)
+	}
+	hunters := util.Randomize(query.Hunters)
+	blinds := util.Randomize(query.Blinds)
+	for _, b := range blinds {
+		println(b)
+	}
+	for _, h := range hunters {
+		println(h)
+	}
+	var results []model.Result
+	for i, hunter := range hunters {
+		println(results)
 		var result = model.Result{}
-		result.HunterName = hunter.Name
-		result.BlindName = getBlindName()
+		result.HunterName = hunterInfo[hunter].Name
+		result.BlindName = getBlindName(blinds[i], blindInfo)
 		results = append(results, result)
 	}
 	context.IndentedJSON(http.StatusOK, results)
 }
 
-func getBlindName() string {
-	blinds = util.Randomize(blinds)
-	var blindName = strconv.Itoa(blinds[0].ID) + " " + blinds[0].Description
-	util.RemoveIndex(blinds, 0)
+func getBlindName(id int, blinds []model.Blind) string {
+	var blindName = strconv.Itoa(blinds[id].ID) + " " + blinds[id].Description
+	println(blindName)
 	return blindName
 }
 
