@@ -11,7 +11,7 @@
     <!-- JS & CSS library of MultiSelect plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/multi-select/0.9.12/js/jquery.multi-select.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/multi-select/0.9.12/css/multi-select.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         #result tr td {
@@ -20,48 +20,77 @@
     </style>
 </head>
 
-<body bgcolor="#7fffd4">
-<form action="http://localhost:9090/lottery" method="POST">
-    <div>
-        <table bgcolor="#7fffd4">
-            <tr>
-                <td>Välj Jägare</td>
-                <td>
-
-                        <select class="js-example-basic-multiple" name="selectHunter[]" id="selectHunter"  multiple="multiple">
-
-                        </select>
-
-                </td>
-                <td>
-                    <button type="button" class="btn-select-all" data-target="selectHunter">välj alla</button>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div>
-        <table bgcolor="#7fffd4">
-            <tr>
-                <td>Välj Pass</td>
-                <td>
-                    <select class="js-example-basic-multiple" name="selectBlind[]" multiple="multiple" id="selectBlind">
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn-select-all" data-target="selectBlind">välj alla</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button type="button" class="btn-result">lotta pass</button>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <table border=0 id="result"></table>
-</form>
+<body >
+<div style=" padding: 5em;
+  width:100%;
+  justify-content: center;">
+    <form action="http://localhost:9090/lottery" method="POST" style="align-content: center">
+        <p>
+        <div style="width:50%;
+  justify-content: left;">
+            <label style="justify-content: center; text-decoration-line: underline;"><b>Välj Jägare</b></label>
+            <p><select class="js-example-basic-multiple" name="selectHunter[]" id="selectHunter" multiple="multiple"
+                       style="width: 20%;">
+            </select>
+            </p>
+            <br>
+            <button type="button" class="btn-select-all" data-target="selectHunter">välj alla</button>
+        </div>
+        </p>
+        <p>
+        <div style="width:100%">
+            <label style="text-decoration-line: underline;"><b>Välj Såt</b></label>
+            <p>
+                <select name="selectArea"  id="area" style="width: 20%;" onselect="loadBlinds()">
+                </select>
+            </p>
+            <br>
+            <button type="button" onclick="loadBlinds()">Ladda Pass för såt</button>
+        </div>
+        </p>
+        <p>
+        <div style="width:100%">
+            <label style="text-decoration-line: underline;"><b>Välj Pass</b></label>
+            <p>
+                <select class="js-example-basic-multiple" name="selectBlind[]" multiple="multiple" id="selectBlind"
+                        style="width: 20%;">
+                </select>
+            </p>
+            <br>
+            <button type="button" class="btn-select-all" data-target="selectBlind">välj alla</button>
+        </div>
+        </p>
+        <p>
+        <div style="width:100%">
+            <button type="button" class="btn-result">Lotta Pass</button>
+        </div>
+        </p>
+        <br/>
+        <div>
+            <label>Resultat</label>
+            <table id="result" style="width:20%"></table>
+        </div>
+    </form>
+</div>
 </body>
 <script>
+    function loadBlinds() {
+        let selectBlind = document.getElementById('selectBlind');
+        selectBlind.innerHTML = ""
+        console.log("loading blinds")
+        var area = document.getElementById("area").value;
+        $.ajax({
+            url: 'http://localhost:9090/blind/'+area,
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    // POPULATE SELECT ELEMENT WITH JSON.
+                    selectBlind.innerHTML = selectBlind.innerHTML +
+                        '<option value="' + data[i]['id'] + '">' + data[i]['id'] + "-" + data[i]['description'] + '</option>';
+                    //console.log(data[i].id)
+                }
+            }
+        })
+    }
     $.ajax({
         url: 'http://localhost:9090/hunter',
         success: function (data) {
@@ -75,26 +104,26 @@
         }
     })
     $.ajax({
-        url: 'http://localhost:9090/blind',
+        url: 'http://localhost:9090/area',
         success: function (data) {
-            let selectBlind = document.getElementById('selectBlind');
+            let area = document.getElementById('area');
             for (var i = 0; i < data.length; i++) {
                 // POPULATE SELECT ELEMENT WITH JSON.
-                selectBlind.innerHTML = selectBlind.innerHTML +
-                    '<option value="' + data[i]['id'] + '">' + data[i]['id'] + "-" + data[i]['description'] + '</option>';
+                area.innerHTML = area.innerHTML +
+                    '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
                 //console.log(data[i].id)
             }
         }
     })
     // Check/uncheck all
-    $('.btn-select-all').click(function(e){
+    $('.btn-select-all').click(function (e) {
         let target = $(this).data('target')
-        let checked = $('#'+target+' option').prop('selected')
-        $('#'+target+' option').prop('selected', !checked);
+        let checked = $('#' + target + ' option').prop('selected')
+        $('#' + target + ' option').prop('selected', !checked);
         $(this).text(checked ? 'välj alla' : 'välj ingen')
     })
     // Post selected data to backend
-    $('.btn-result').click(function(e){
+    $('.btn-result').click(function (e) {
         let data = {
             "hunters": $('#selectHunter').val(),
             "blinds": $('#selectBlind').val()
@@ -108,7 +137,7 @@
                 //console.log(data)
                 result.innerHTML = "";
                 for (var i = 0; i < data.length; i++) {
-                    $('#result').append('<tr><td>' + data[i].HunterName + '</td><td>' + data[i].BlindName + '</td></tr>')
+                    $('#result').append('<tr style="width:50%"><td>' + data[i].HunterName + '</td><td>' + data[i].BlindName + '</td></tr>')
                 }
             }
         })

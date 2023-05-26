@@ -17,11 +17,45 @@ func main() {
 	engine.DELETE("/hunter", deleteHunter)
 	engine.PUT("/hunter", updateHunter)
 	engine.GET("/blind", getBlinds)
+	engine.GET("/blind/:area", getBlindsByArea)
 	engine.POST("/blind", addBlind)
 	engine.DELETE("/blind", deleteBlind)
+	engine.GET("/area", getAreas)
 	engine.POST("/lottery", getBlindLotteryResult)
 	engine.Static("/web", "./public")
 	engine.Run("localhost:9090")
+}
+
+func getAreas(context *gin.Context) {
+	context.IndentedJSON(http.StatusOK, model.GetAreas())
+}
+
+func getBlindsByArea(context *gin.Context) {
+	println("getBlindsByArea start ")
+	var blinds = []model.Blind{}
+	area := context.Param("area")
+	println("area: " + area)
+	var blindIds []int
+	for _, a := range model.GetAreas() {
+		id, _ := strconv.Atoi(area)
+		if id == a.Id {
+			println(a.Id)
+			println(a.Name)
+			println(a.BlindIds)
+			blindIds = a.BlindIds
+		}
+	}
+	println("blinds for area: ", blindIds)
+	var blindInfo = model.GetBlinds()
+	for _, blind := range blindInfo {
+		id, _ := strconv.Atoi(blind.ID)
+		if util.Contains(blindIds, id) {
+			blinds = append(blinds, blind)
+		}
+
+	}
+	println("getBlindsByArea end", blinds)
+	context.IndentedJSON(http.StatusOK, blinds)
 }
 
 type Query struct {
@@ -34,24 +68,18 @@ func getBlindLotteryResult(context *gin.Context) {
 	context.BindJSON(&query)
 	var hunterInfo = model.GetHunters()
 	var blindInfo = model.GetBlinds()
-	for i, b := range query.Blinds {
-		println(i, b)
-	}
-	for i, h := range query.Hunters {
-		println(i, h)
-	}
 	hunters := util.Randomize(query.Hunters)
 	blinds := util.Randomize(query.Blinds)
 
 	var results []model.Result
 	for i, hunter := range hunters {
-		println(results)
 		var result = model.Result{}
 		hunterIndex, _ := strconv.Atoi(hunter)
 		result.HunterName = hunterInfo[hunterIndex-1].Name
 		result.BlindName = getBlindName(blinds[i], blindInfo)
 		results = append(results, result)
 	}
+	model.By(model.Name).Sort(results)
 	context.IndentedJSON(http.StatusOK, results)
 }
 

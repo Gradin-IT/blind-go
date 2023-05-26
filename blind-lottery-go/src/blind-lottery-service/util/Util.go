@@ -25,3 +25,11 @@ func Randomize[T comparable](collection []T) []T {
 	})
 	return collection
 }
+func Contains[T comparable](s []T, e T) bool {
+	for _, v := range s {
+		if v == e {
+			return true
+		}
+	}
+	return false
+}

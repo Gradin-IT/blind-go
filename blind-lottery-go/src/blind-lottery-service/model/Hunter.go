@@ -10,9 +10,11 @@ import (
 )
 
 type Hunter struct {
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
-	Mobile string `json:"mobile"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Mobile    string `json:"mobile"`
+	HasDog    bool   `json:"hasDog"`
+	ShortWalk bool   `json:"shortWalk"`
 }
 
 var hunters = []Hunter{}
